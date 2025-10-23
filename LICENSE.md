@@ -10,7 +10,7 @@ This project, ESP32 Animated Eye Project, is released under the following terms:
    - You must credit the original author by mentioning "intellar.ca" and linking to the GitHub repository.
 
 3. Commercial inquiries:
-   - For commercial licensing or partnership opportunities, please contact: intellar.ca@gmail.com
+   - For commercial licensing or partnership opportunities, please contact: intellar@intellar.ca
 
 4. No warranty:
    - This software is provided "as is", without any warranty of any kind.
