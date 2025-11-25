@@ -2,11 +2,11 @@
 
 A high-performance, procedurally animated eye project for the ESP32, designed to run on dual round TFT displays. This project simulates a realistic gaze with natural, darting movements.
 
-Demo video:  https://youtube.com/shorts/sL-4OHZ6nAY
+Demo video:  https://youtube.com/shorts/loqei5ePCf8
 Project description:  intellar.ca
 
 
-![eye](https://github.com/intellar/Dual_Display_ESP32/blob/59f62b9661e4f090fe4e4896dfc0a7bc8c96305e/demo.jpg)
+![eye](https://github.com/intellar/Dual_Display_ESP32/blob/a1a2becd6ae632142c8d18d7190425f8b9b0b366/demo.png)
 
 ## Author & License
 
