@@ -1,12 +1,12 @@
-# ESP32 Animated Eye Project
+# ESP32 Animated Eye with ToF Sensor Tracking
 
-A high-performance, procedurally animated eye project for the ESP32, designed to run on dual round TFT displays. This project simulates a realistic gaze with natural, darting movements.
+A high-performance, animated eye project for the ESP32-S3 that uses a VL53L5CX Time-of-Flight sensor to track objects and direct the eye's gaze.
 
 Demo video:  https://youtube.com/shorts/loqei5ePCf8
 Project description:  intellar.ca
 
 
-![eye](https://github.com/intellar/Dual_Display_ESP32/blob/a1a2becd6ae632142c8d18d7190425f8b9b0b366/demo.png)
+![Project Demo Image](https://github.com/intellar/Dual_Display_ESP32/blob/bd06864a046d26ce7f1886804b78c7f66b0bc624/demo.png)
 
 ## Author & License
 
@@ -17,51 +17,57 @@ Project description:  intellar.ca
 
 ## Features
 
-*   **2D Gaze Model:** Simulates eye movement by choosing random points on a 2D plane.
-*   **Procedural Animation:** All animation is generated in code, not pre-rendered.
-    *   **Saccadic Eye Movements:** Mimics natural, darting motions by smoothly interpolating to new random targets.
-*   **High-Performance Rendering:** Achieves smooth frame rates on an ESP32 using several optimization techniques:
-    *   Double-buffering for tear-free updates.    
+*   **Target Tracking:** Uses a VL53L5CX 8x8 ToF sensor to detect the closest object and direct the eye's gaze towards it.
+*   **Procedural Animation:** All animation is generated in code.
+    *   **Smooth Pursuit:** The eye smoothly follows a moving target.
+    *   **Saccadic Idle Movement:** When no target is present, the eye mimics natural, darting motions (saccades) by interpolating to new random points.
+*   **High-Performance Rendering:** Achieves smooth frame rates on an ESP32-S3 using several optimizations:
+    *   **Double Buffering:** Off-screen framebuffers in PSRAM ensure tear-free updates.
     *   Pre-calculated scanlines for fast circular clipping.
-*   **Highly Configurable:** Almost all parameters, from animation timings to hardware pins, are easily tweakable in the central `config.h` file.
-*   **Memory Usage Logging:** Prints detailed heap and PSRAM usage to the serial monitor at startup.
-*   **Asset-Based:** Uses `.bin` image files for eye textures, loaded from the ESP32's LittleFS filesystem.
+    *   **Optimized Drawing:** Uses fixed-point math and direct framebuffer manipulation.
+*   **PlatformIO Environment:** Configured for a professional workflow with VS Code, providing faster compilation and easier dependency management.
+*   **Advanced Debugging:**
+    *   **Calibration Mode:** A built-in simulation mode (`TOF_CALIBRATION_MODE`) tests the tracking logic with a virtual target pattern.
+    *   **Debug Grid:** An optional real-time visualization of the ToF sensor's 8x8 matrix can be overlaid on one of the displays.
+*   **Asset-Based:** Uses `.bin` image files for eye textures, loaded from the ESP32's LittleFS filesystem at runtime.
 
 ## Hardware Requirements
 
-*   **Microcontroller:** An ESP32 (WROOM, S2, S3, etc.). PSRAM is highly recommended.
-*   **Displays:** Two round 240x240 TFT displays based on the ST7789 driver.
-*   **Wiring:** Appropriate wiring to connect the displays to the ESP32's SPI pins.
+*   **Microcontroller:** An ESP32-S3 with PSRAM (e.g., ESP32-S3-DevKitC-1-N16R8V).
+*   **Displays:** Two round 240x240 TFT displays based on the **GC9A01** driver.
+*   **ToF Sensor:** A **VL53L5CX** Time-of-Flight sensor breakout board (e.g., from SparkFun).
 
 ## Software & Dependencies
 
-*   **Framework:** Arduino IDE or PlatformIO.
+*   **IDE:** Visual Studio Code with the **PlatformIO** extension.
 *   **Libraries:**
-    *   `TFT_eSPI` by Bodmer. This must be configured for your specific ESP32 and ST7789 displays.
-    *   `LittleFS` library for ESP32 (usually included with the ESP32 board package).
+    *   `bodmer/TFT_eSPI`
+    *   `sparkfun/SparkFun VL53L5CX Arduino Library`
+    *   These are managed automatically by PlatformIO via the `platformio.ini` file.
 
 ## Installation & Setup
 
-1.  **Install Libraries:**
-    *   Install the `TFT_eSPI` library using the Arduino Library Manager.
-    *   **Crucially**, you must configure `TFT_eSPI` for your hardware. Edit the `User_Setup.h` file inside the `TFT_eSPI` library folder to define your ESP32 model and the pins connected to your displays.
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/intellar/Dual_Display_ESP32.git
+    ```
 
-2.  **Prepare Image Assets:**
-    *   This project uses raw 16-bit (RGB565) binary image files for the eye textures. The default size is 350x350 pixels.
-    *   Create your eye texture (e.g., `eye_real.bin`). A helper tool is provided in the `image_tools` directory.
-    *   Place your `.bin` file (e.g., `eye_real.bin`) inside a `data` folder in your Arduino sketch directory.
+2.  **Open in VS Code:**
+    *   Open the cloned `Dual_Display_ESP32/firmware` folder in Visual Studio Code.
+    *   PlatformIO should automatically recognize the project and prompt you to install the required library dependencies.
 
-3.  **Upload Filesystem to ESP32:**
-    *   In the Arduino IDE, you need the **ESP32 Sketch Data Upload** tool. If you don't have it, you can find installation instructions online for "ESP32 Sketch Data Upload".
-    *   Once installed, go to `Tools` -> `ESP32 Sketch Data Upload` to upload the contents of your `data` folder to the ESP32's LittleFS partition.
+3.  **Configure Hardware Pins in `platformio.ini`:**
+    *   Open the `platformio.ini` file. This is the central place for all hardware configuration.
+    *   **TFT_eSPI Configuration:** All display settings are defined here using `build_flags`. This method bypasses the need to edit the `TFT_eSPI` library's `User_Setup.h` file.
+    *   Adjust the pin numbers (`-D TFT_MOSI=...`, `-D TFT_SCLK=...`, etc.) and other display settings to match your specific wiring.
+    *   The chip select pins for the two displays (`PIN_CS1`, `PIN_CS2`) are defined in `firmware/include/config.h`.
 
-4.  **Configure Project:**
-    *   Open the `config.h` file in this project.
-    *   Set `PIN_CS1` and `PIN_CS2` to match the chip-select pins you have wired for your left and right displays.
+4.  **Upload Filesystem:**
+    *   The eye texture images (`.bin` files) are located in the `firmware/data` directory.
+    *   In the PlatformIO sidebar, expand the project tasks for your environment (e.g., `esp32-s3-devkitc-1-n16r8v`) and run **"Upload Filesystem Image"**.
 
 5.  **Compile and Upload:**
-    *   Select your ESP32 board and port in the Arduino IDE.
-    *   Compile and upload the sketch.
+    *   Run the **"Upload"** task from the PlatformIO sidebar.
 
 ## Creating Custom Eye Textures
 
@@ -69,7 +75,7 @@ A Python-based GUI tool is included to help you convert your own images into the
 
 1.  **Location:** The tool is located at `image_tools/gui-image-tools.py`.
 
-2.  **Requirements:** You need Python and the `Pillow` library installed.
+2.  **Requirements:** You need Python 3 and the `Pillow` library installed.
     ```bash
     pip install Pillow
     ```
@@ -77,32 +83,43 @@ A Python-based GUI tool is included to help you convert your own images into the
 3.  **How to Use:**
     *   Run the script: `python image_tools/gui-image-tools.py`
     *   Click "Load Image (PNG/BMP)" to select your source image.
-    *   The width and height will be auto-filled. Ensure they match the dimensions in `config.h` (e.g., 350x350).
-    *   Click "Generate Binary File" and save the output (e.g., `eye_real.bin`) into the `data` folder of your sketch.
+    *   Ensure the dimensions match those in `firmware/include/config.h` (e.g., 350x350).
+    *   Click "Generate Binary File" and save the output into the `firmware/data` folder, overwriting the existing assets if desired.
+    *   Remember to re-run the "Upload Filesystem Image" task in PlatformIO after changing assets.
 
 ## How It Works
 
 The animation is driven by a state-based system in the main `loop()`.
 
-1.  **Gaze Calculation (`update_eye_target`, `update_eye_position`):**
-    *   A random 2D `target_offset` is chosen within a circular area.
-    *   The code smoothly interpolates the `current_offset` towards this target to create fluid movement.
-    *   This final `(x, y)` offset is used to position the eye texture on each screen.
-2.  **Rendering (`draw_scene`):**
-    *   The scene is drawn into off-screen framebuffers (one for each eye).
-    *   The main eye texture is drawn using `draw_scaled_circular_image_with_eyelid`, which performs circular clipping.
-3.  **Display:**
-    *   The contents of both framebuffers are pushed to the physical displays simultaneously.
+1.  **Sensor Update (`update_tof_sensor_data`):**
+    *   The VL53L5CX sensor is polled for new data.
+    *   `process_measurement_data` analyzes the 8x8 distance matrix to find the pixel with the minimum distance, validating it against its neighbors to ensure it's a reliable target.
+    *   If a valid target is found, its coordinates are mapped from the sensor's grid (0-7) to the eye's normalized coordinate system (-1.0 to 1.0).
 
-## Configuration (`config.h`)
+2.  **Gaze Logic:**
+    *   If a target is valid, its coordinates become the goal for the eye's gaze.
+    *   If no target is valid, the system falls back to the idle saccade behavior, picking a new random point to look at after a set interval.
+    *   The current eye position is smoothly interpolated (LERPed) towards the goal position on every frame, creating fluid motion.
 
-This file is the central control panel for the project.
+3.  **Rendering (`draw_eye_at_target`):**
+    *   The scene is drawn into off-screen framebuffers.
+    *   The main eye texture is drawn at an offset calculated from the final eye position.
+    *   The optional debug grid and FPS counter are drawn on top.
 
-*   **Hardware & Pinout:** Define your screen chip-select pins.
-*   **Display & Image:** Set the dimensions of your source images and the transparent color key.
-*   **Asset File Paths:** Change the names of the `.bin` files if you use different assets.
-*   **Animation Behavior:** Adjust the eye's movement range, speed, and the timing for saccades.
-*   **Memory Monitoring:** The project logs memory usage to the serial monitor at startup.
+4.  **Display:**
+    *   The contents of the completed framebuffers are pushed to the physical displays.
+
+## Configuration
+
+Key parameters can be adjusted in two files:
+
+### `platformio.ini`
+*   **Hardware Pins:** All pin definitions for the displays (SPI) and ToF sensor (I2C) are located in the `build_flags` section. This is where you configure `TFT_eSPI`.
+
+### `firmware/include/config.h`
+*   **Features:** Enable or disable the ToF sensor (`USE_TOF_SENSOR`) or activate the calibration simulation (`TOF_CALIBRATION_MODE`).
+*   **Animation Behavior:** Adjust the eye's movement range (`MAX_2D_OFFSET_PIXELS`), interpolation speed (`LERP_SPEED`), and the timing for idle saccades.
+*   **Sensor Behavior:** Configure the maximum tracking distance (`MAX_DIST_TOF`).
 
 ## Contributing
 
