@@ -11,7 +11,7 @@ Project description:  intellar.ca
 ## Author & License
 
 *   **Author:** Intellar ([github.com/intellar](https://github.com/intellar))
-*   **License:** This project is released under a custom license. See the LICENSE.md file for details.
+*   **License:** This project is released under a custom license. See the LICENSE.md file for details.  Acknowledge and cite intellar in derivative works !
 
 ---
 
