@@ -5,6 +5,10 @@ A high-performance, animated eye project for the ESP32-S3 that uses a VL53L5CX T
 Demo video:  https://youtube.com/shorts/loqei5ePCf8
 Project description:  intellar.ca
 
+If you found this library useful in your project, please cite intellar.ca and considere giving it a star ⭐
+
+You can also be the hero of the day by supporting my projects, https://buymeacoffee.com/intellar
+
 
 ![Project Demo Image](https://github.com/intellar/Dual_Display_ESP32/blob/bd06864a046d26ce7f1886804b78c7f66b0bc624/demo.png)
 
